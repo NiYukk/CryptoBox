@@ -58,7 +58,10 @@ jobs:
 
       # 构建 Windows 平台可执行文件
       - name: Build Windows EXE
-        run: wails build -platform windows/amd64
+        run: |
+          # Ensure the environment variables are reloaded for this step
+          source $GITHUB_ENV
+          wails build -platform windows/amd64
 
       # 上传构建产物
       - name: Upload build artifacts
