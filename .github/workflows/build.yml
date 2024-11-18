@@ -1,4 +1,4 @@
-  name: Build Wails Project
+name: Build Wails Project
 
 on:
   push:
