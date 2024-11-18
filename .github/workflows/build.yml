@@ -32,11 +32,17 @@ jobs:
           echo "Go environment:"
           go env
 
+      # 检查 Go 版本
+      - name: Check Go version and subcommands
+        run: |
+          go version
+          go help mod
+
       # 启用 Go 模块模式
       - name: Enable Go module mode
         run: echo "GO111MODULE=on" >> $GITHUB_ENV
 
-      # 确保 Go 模块初始化和依赖安装
+      # 初始化并清理 Go 模块
       - name: Initialize and tidy Go module
         run: |
           cd $GITHUB_WORKSPACE
