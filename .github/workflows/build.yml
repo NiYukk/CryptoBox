@@ -59,7 +59,7 @@ jobs:
       # 构建 Windows 平台可执行文件
       - name: Build Windows EXE
         run: |
-          # Ensure the environment variables are reloaded for this step
+          # Reload the environment variables to make wails available
           source $GITHUB_ENV
           wails build -platform windows/amd64
 
