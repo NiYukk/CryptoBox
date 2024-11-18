@@ -18,31 +18,30 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # 安装指定版本的 Go
-      - name: Setup Go
-        uses: actions/setup-go@v4
-        with:
-          go-version: 1.20
+      # 清理并重新安装 Go
+      - name: Ensure fresh Go installation
+        run: |
+          sudo rm -rf /usr/local/go
+          curl -LO https://golang.org/dl/go1.20.5.linux-amd64.tar.gz
+          sudo tar -C /usr/local -xzf go1.20.5.linux-amd64.tar.gz
+          echo "export PATH=/usr/local/go/bin:$PATH" >> $GITHUB_ENV
 
       # 验证 Go 安装
-      - name: Check Go installation
+      - name: Verify Go installation
         run: |
           echo "Go version:"
           go version
-          echo "Go root:"
-          go env GOROOT
-          echo "Go path:"
-          go env GOPATH
-          echo "Environment PATH:"
-          echo $PATH
+          echo "Go environment:"
+          go env
 
-      # 启用模块模式
+      # 启用 Go 模块模式
       - name: Enable Go module mode
         run: echo "GO111MODULE=on" >> $GITHUB_ENV
 
       # 初始化 Go 模块
       - name: Initialize Go module
         run: |
+          cd $GITHUB_WORKSPACE
           if [ ! -f go.mod ]; then
             echo "No go.mod found, initializing Go module."
             go mod init example.com/myproject
@@ -52,8 +51,9 @@ jobs:
       # 安装 Wails CLI
       - name: Install Wails CLI
         run: |
+          mkdir -p $HOME/go/bin
           export GOBIN=$HOME/go/bin
-          mkdir -p $GOBIN
+          echo "export PATH=$GOBIN:$PATH" >> $GITHUB_ENV
           go install github.com/wailsapp/wails/v2/cmd/wails@latest
 
       # 构建 Windows 平台可执行文件
