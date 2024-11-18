@@ -18,13 +18,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # 设置 Go 环境，确保安装 Go 1.20
-      - name: Setup Go 1.20
+      # 设置 Go 环境
+      - name: Setup Go
         uses: actions/setup-go@v4
         with:
           go-version: 1.20
 
-      # 验证 Go 安装
+      # 验证 Go 安装和环境
       - name: Verify Go installation
         run: |
           echo "Go version:"
@@ -32,18 +32,12 @@ jobs:
           echo "Go environment:"
           go env
 
-      # 检查 Go 版本并验证模块支持
-      - name: Check Go version and subcommands
-        run: |
-          go version
-          go help mod  # 确保 go mod 子命令可以工作
-
       # 启用 Go 模块模式
       - name: Enable Go module mode
         run: echo "GO111MODULE=on" >> $GITHUB_ENV
 
-      # 初始化并清理 Go 模块
-      - name: Initialize and tidy Go module
+      # 安装依赖
+      - name: Install dependencies
         run: |
           cd $GITHUB_WORKSPACE
           go mod tidy
@@ -56,16 +50,11 @@ jobs:
           echo "export PATH=$GOBIN:$PATH" >> $GITHUB_ENV
           go install github.com/wailsapp/wails/v2/cmd/wails@latest
 
-      # 验证 Wails 安装
-      - name: Verify Wails installation
-        run: |
-          echo "Checking Wails installation:"
-          which wails
-          wails --version
-
       # 构建 Windows 平台可执行文件
       - name: Build Windows EXE
-        run: wails build -platform windows/amd64
+        run: |
+          cd $GITHUB_WORKSPACE
+          wails build -platform windows/amd64
 
       # 上传构建产物
       - name: Upload build artifacts
