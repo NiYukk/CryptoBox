@@ -61,6 +61,7 @@ jobs:
         run: |
           # Ensure Wails CLI is in PATH
           export PATH=$HOME/go/bin:$PATH
+          cd $GITHUB_WORKSPACE  # Ensure we're in the root directory of the repo
           wails build -platform windows/amd64
 
       # 上传构建产物
