@@ -14,37 +14,30 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. 检出代码
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # 2. 设置 Go 环境
       - name: Setup Go
         uses: actions/setup-go@v4
         with:
           go-version: 1.20
 
-      # 3. 缓存 Go 依赖
-      - name: Cache Go modules
-        uses: actions/cache@v3
-        with:
-          path: ~/.cache/go-build
-          key: ${{ runner.os }}-go-mod-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-go-mod-
+      - name: Enable Go module mode
+        run: echo "GO111MODULE=on" >> $GITHUB_ENV
 
-      # 4. 初始化 Go 模块（如果没有 go.mod 文件）
+      - name: Check Go version
+        run: go version
+
       - name: Initialize Go module
         run: |
           if [ ! -f go.mod ]; then
             echo "No go.mod found, initializing Go module."
             go mod init example.com/myproject
           fi
+          go mod tidy
 
-      # 5. 安装 Wails CLI
       - name: Install Wails CLI
         run: |
-          export GO111MODULE=on
           export GOBIN=$HOME/go/bin
           mkdir -p $GOBIN
           go install github.com/wailsapp/wails/v2/cmd/wails@latest
@@ -52,44 +45,12 @@ jobs:
           GOROOT: /opt/hostedtoolcache/go/1.20.0/x64
           GOPATH: ${{ runner.temp }}/go
 
-      # 6. 添加 Wails CLI 路径到环境变量
       - name: Add GOBIN to PATH
         run: echo "$HOME/go/bin" >> $GITHUB_PATH
 
-      # 7. 安装 Node.js 环境
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
-
-      # 8. 缓存 Node.js 依赖
-      - name: Cache Node.js modules
-        uses: actions/cache@v3
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-modules-
-
-      # 9. 安装前端依赖（可选）
-      - name: Install frontend dependencies
-        run: |
-          if [ -f package.json ]; then
-            npm install
-            npm run build
-          else
-            echo "No frontend dependencies to install."
-          fi
-
-      # 10. 安装 MinGW
-      - name: Install MinGW for cross-compilation
-        run: sudo apt-get install -y mingw-w64
-
-      # 11. 构建 Windows 平台可执行文件
       - name: Build Windows EXE
         run: wails build -platform windows/amd64
 
-      # 12. 上传构建产物
       - name: Upload build artifacts
         uses: actions/upload-artifact@v3
         with:
