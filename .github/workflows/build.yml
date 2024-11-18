@@ -18,7 +18,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # 设置 Go 环境（使用官方 GitHub Action）
+      # 设置 Go 环境，确保安装 Go 1.20
       - name: Setup Go 1.20
         uses: actions/setup-go@v4
         with:
@@ -32,11 +32,11 @@ jobs:
           echo "Go environment:"
           go env
 
-      # 检查 Go 版本
+      # 检查 Go 版本并验证模块支持
       - name: Check Go version and subcommands
         run: |
           go version
-          go help mod
+          go help mod  # 确保 go mod 子命令可以工作
 
       # 启用 Go 模块模式
       - name: Enable Go module mode
