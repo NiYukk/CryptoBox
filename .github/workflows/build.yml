@@ -53,14 +53,14 @@ jobs:
         run: |
           mkdir -p $HOME/go/bin
           export GOBIN=$HOME/go/bin
-          echo "export PATH=$GOBIN:$PATH" >> $GITHUB_ENV
+          export PATH=$GOBIN:$PATH  # Ensure this PATH is applied in the current step
           go install github.com/wailsapp/wails/v2/cmd/wails@latest
 
       # 构建 Windows 平台可执行文件
       - name: Build Windows EXE
         run: |
-          # Reload the environment variables to make wails available
-          source $GITHUB_ENV
+          # Ensure Wails CLI is in PATH
+          export PATH=$HOME/go/bin:$PATH
           wails build -platform windows/amd64
 
       # 上传构建产物
