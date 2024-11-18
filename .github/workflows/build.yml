@@ -56,6 +56,22 @@ jobs:
           export PATH=$GOBIN:$PATH  # Ensure this PATH is applied in the current step
           go install github.com/wailsapp/wails/v2/cmd/wails@latest
 
+      # Debug: List files to check for wails.json
+      - name: List files in the root directory
+        run: |
+          echo "Listing files in the current directory to ensure wails.json exists:"
+          ls -la $GITHUB_WORKSPACE
+
+      # 检查 wails.json 是否存在
+      - name: Check for wails.json file
+        run: |
+          if [ ! -f "$GITHUB_WORKSPACE/wails.json" ]; then
+            echo "ERROR: wails.json not found"
+            exit 1
+          else
+            echo "wails.json found."
+          fi
+
       # 构建 Windows 平台可执行文件
       - name: Build Windows EXE
         run: |
