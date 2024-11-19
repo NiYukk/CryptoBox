@@ -35,22 +35,10 @@ jobs:
           export PATH=$GOBIN:$PATH
           go install github.com/wailsapp/wails/v2/cmd/wails@latest
 
-      # 创建空的 frontend/package.json 文件（如果需要）
-      - name: Create empty frontend/package.json
+      # 创建软链接，将 info.json 文件链接到根目录
+      - name: Create symlink for info.json
         run: |
-          mkdir -p $GITHUB_WORKSPACE/frontend
-          echo '{"name":"frontend","version":"1.0.0","dependencies":{},"devDependencies":{}}' > $GITHUB_WORKSPACE/frontend/package.json
-
-      # 禁用前端构建，使用 wails.json 配置
-      - name: Disable frontend build in wails.json
-        run: |
-          echo '{
-            "name": "CryptoBox",
-            "frontend": {"use": "none"},
-            "go": {
-              "build": {"platforms": ["windows/amd64"]}
-            }
-          }' > $GITHUB_WORKSPACE/wails.json
+          ln -sf $GITHUB_WORKSPACE/CryptoBox/build/windows/info.json $GITHUB_WORKSPACE/info.json
 
       # 创建软链接，将 CryptoBox/codebox 目录链接到根目录
       - name: Create symlink for codebox
