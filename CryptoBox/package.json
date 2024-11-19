@@ -1,0 +1,62 @@
+{
+  "private": true,
+  "name": "cryptography",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "dumi dev",
+    "docs:build": "dumi build",
+    "docs:deploy": "gh-pages -d docs-dist",
+    "ghdeploy": "dumi build && gh-pages -d docs-dist",
+    "build": "father build",
+    "deploy": "npm run docs:build && npm run docs:deploy",
+    "prettier": "prettier --write \"**/*.{js,jsx,tsx,ts,less,md,json}\"",
+    "test": "umi-test",
+    "test:coverage": "umi-test --coverage",
+    "prepublishOnly": "npm run build"
+  },
+  "files": [
+    "dist"
+  ],
+  "module": "dist/esm/index.js",
+  "typings": "dist/esm/index.d.ts",
+  "gitHooks": {
+    "pre-commit": "lint-staged"
+  },
+  "lint-staged": {
+    "*.{js,jsx,less,md,json}": [
+      "prettier --write"
+    ],
+    "*.ts?(x)": [
+      "prettier --parser=typescript --write"
+    ]
+  },
+  "dependencies": {
+    "@noble/ed25519": "^1.7.1",
+    "@noble/hashes": "^1.2.0",
+    "@noble/secp256k1": "^1.7.1",
+    "antd": "^4.23.6",
+    "crypto-js": "^4.1.1",
+    "gm-crypto": "^0.1.8",
+    "js-crypto-hkdf": "^1.0.4",
+    "js-sha3": "^0.8.0",
+    "keccak": "^3.0.3",
+    "keccak256": "^1.0.6",
+    "react": "^18.0.0"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^5.15.1",
+    "@testing-library/react": "^13.0.0",
+    "@types/jest": "^27.0.3",
+    "@types/sm-crypto": "^0.3.0",
+    "@umijs/fabric": "^2.8.1",
+    "@umijs/plugin-analytics": "^0.2.3",
+    "@umijs/test": "^3.0.5",
+    "dumi": "^1.1.0",
+    "father": "^4.0.0-rc.2",
+    "gh-pages": "^3.0.0",
+    "lint-staged": "^10.0.7",
+    "prettier": "^2.2.1",
+    "sm-crypto": "^0.3.12",
+    "yorkie": "^2.0.0"
+  }
+}
