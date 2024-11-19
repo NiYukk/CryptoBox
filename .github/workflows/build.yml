@@ -63,6 +63,12 @@ jobs:
         run: |
           ln -s $GITHUB_WORKSPACE/CryptoBox/wails.json $GITHUB_WORKSPACE/wails.json
 
+      # 更新 Wails 版本
+      - name: Update Wails version in go.mod
+        run: |
+          go get github.com/wailsapp/wails@v2.9.2
+          go mod tidy
+
       # Debug: List files to check for go.mod and wails.json in root directory
       - name: List files in the root directory to check for go.mod and wails.json
         run: |
