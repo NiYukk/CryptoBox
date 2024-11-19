@@ -72,12 +72,12 @@ jobs:
           go mod tidy
           go mod vendor
 
-      # 构建 Windows 平台可执行文件，禁用前端构建
-      - name: Build Windows EXE (No Frontend)
+      # 构建 Windows 平台可执行文件，跳过前端构建
+      - name: Build Windows EXE
         run: |
           cd $GITHUB_WORKSPACE
           export PATH=$HOME/go/bin:$PATH
-          wails build -platform windows/amd64 --no-frontend
+          wails build -platform windows/amd64
 
       # 上传构建产物
       - name: Upload build artifacts
