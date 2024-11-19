@@ -17,7 +17,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # 确保 Go 安装是最新的
+      # 安装 Go
       - name: Install Go
         run: |
           sudo rm -rf /usr/local/go
@@ -27,25 +27,6 @@ jobs:
           echo "GOPATH=$HOME/go" >> $GITHUB_ENV
           echo "GOBIN=$HOME/go/bin" >> $GITHUB_ENV
 
-      # 确保 Go 环境配置正确
-      - name: Verify Go installation
-        run: |
-          echo "Go version:"
-          go version
-          echo "Go environment:"
-          go env
-
-      # 缓存 Go 模块依赖
-      - name: Cache Go modules
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.cache/go-build
-            ~/go/pkg/mod
-          key: go-${{ runner.os }}-mod-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            go-${{ runner.os }}-mod-
-
       # 安装 Wails CLI
       - name: Install Wails CLI
         run: |
@@ -54,29 +35,39 @@ jobs:
           export PATH=$GOBIN:$PATH
           go install github.com/wailsapp/wails/v2/cmd/wails@latest
 
+      # 创建软链接，将 main.go 和 app.go 链接到项目根目录
+      - name: Create symlink for Go files
+        run: |
+          ln -sf $GITHUB_WORKSPACE/CryptoBox/main.go $GITHUB_WORKSPACE/main.go
+          ln -sf $GITHUB_WORKSPACE/CryptoBox/app.go $GITHUB_WORKSPACE/app.go
+
       # 确保 `go.mod` 和 `wails.json` 文件正确链接
       - name: Create symlink for go.mod and wails.json
         run: |
           ln -sf $GITHUB_WORKSPACE/CryptoBox/go.mod $GITHUB_WORKSPACE/go.mod
           ln -sf $GITHUB_WORKSPACE/CryptoBox/wails.json $GITHUB_WORKSPACE/wails.json
 
-      # 更新 Go 模块并安装 Wails 依赖
-      - name: Ensure Go modules and Wails dependencies are up-to-date
+      # 确保 Go 模块和 Wails 依赖被更新
+      - name: Update Wails version and ensure Go modules
         run: |
-          go mod tidy
           go get github.com/wailsapp/wails/v2@v2.9.2
+          go mod tidy
 
-      # 确认 go.mod 文件已正确更新
-      - name: Verify go.mod and go.sum
+      # 确保 Go 源文件存在
+      - name: Check for Go files
         run: |
-          cat go.mod
-          cat go.sum
+          if [ ! -f "$GITHUB_WORKSPACE/main.go" ]; then
+            echo "ERROR: No Go files found in root directory"
+            exit 1
+          else
+            echo "Go files found."
+          fi
 
       # 构建 Windows 平台可执行文件
       - name: Build Windows EXE
         run: |
+          cd $GITHUB_WORKSPACE  # 确保我们在项目根目录
           export PATH=$HOME/go/bin:$PATH
-          cd $GITHUB_WORKSPACE  # 确保处于项目根目录
           wails build -platform windows/amd64
 
       # 上传构建产物
