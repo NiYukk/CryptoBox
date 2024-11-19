@@ -53,16 +53,21 @@ jobs:
           export PATH=$GOBIN:$PATH
           go install github.com/wailsapp/wails/v2/cmd/wails@latest
 
-      # Debug: List files to check for wails.json in CryptoBox
-      - name: List files in CryptoBox to check for wails.json
+      # 创建软链接，将 CryptoBox/wails.json 链接到根目录
+      - name: Create symlink for wails.json in root directory
         run: |
-          echo "Listing files in CryptoBox to ensure wails.json exists:"
-          ls -la $GITHUB_WORKSPACE/CryptoBox
+          ln -s $GITHUB_WORKSPACE/CryptoBox/wails.json $GITHUB_WORKSPACE/wails.json
+
+      # Debug: List files to check for wails.json in root directory
+      - name: List files in the root directory to check for wails.json
+        run: |
+          echo "Listing files in the root directory to ensure wails.json exists:"
+          ls -la $GITHUB_WORKSPACE
 
       # 检查 wails.json 是否存在
       - name: Check for wails.json file
         run: |
-          if [ ! -f "$GITHUB_WORKSPACE/CryptoBox/wails.json" ]; then
+          if [ ! -f "$GITHUB_WORKSPACE/wails.json" ]; then
             echo "ERROR: wails.json not found"
             exit 1
           else
