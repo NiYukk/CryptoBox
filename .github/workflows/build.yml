@@ -53,20 +53,20 @@ jobs:
           export PATH=$GOBIN:$PATH
           go install github.com/wailsapp/wails/v2/cmd/wails@latest
 
-      # Debug: List files to check for wails.json
+      # Debug: List files to check for info.json
       - name: List files in the root directory
         run: |
-          echo "Listing files in the current directory to ensure wails.json exists:"
+          echo "Listing files in the current directory to ensure info.json exists:"
           ls -la $GITHUB_WORKSPACE
 
-      # 检查 wails.json 是否存在
-      - name: Check for wails.json file
+      # 检查 info.json 是否存在
+      - name: Check for info.json file
         run: |
-          if [ ! -f "$GITHUB_WORKSPACE/wails.json" ]; then
-            echo "ERROR: wails.json not found"
+          if [ ! -f "$GITHUB_WORKSPACE/info.json" ]; then
+            echo "ERROR: info.json not found"
             exit 1
           else
-            echo "wails.json found."
+            echo "info.json found."
           fi
 
       # 构建 Windows 平台可执行文件
