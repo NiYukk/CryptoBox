@@ -35,6 +35,12 @@ jobs:
           export PATH=$GOBIN:$PATH
           go install github.com/wailsapp/wails/v2/cmd/wails@latest
 
+      # 安装前端依赖
+      - name: Install frontend dependencies
+        run: |
+          cd $GITHUB_WORKSPACE/frontend
+          npm install
+
       # 创建软链接，将 CryptoBox/codebox 目录链接到根目录
       - name: Create symlink for codebox
         run: |
