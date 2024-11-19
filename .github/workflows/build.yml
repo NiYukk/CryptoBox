@@ -17,89 +17,66 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # 缓存 Go 安装
-      - name: Cache Go installation
-        uses: actions/cache@v3
-        with:
-          path: /usr/local/go
-          key: go-${{ runner.os }}-1.20.5
-          restore-keys: |
-            go-${{ runner.os }}-
-
-      # 安装 Go 如果缓存没有命中
-      - name: Ensure fresh Go installation
-        if: steps.cache-go.outputs.cache-hit != 'true'
+      # 确保 Go 安装是最新的
+      - name: Install Go
         run: |
           sudo rm -rf /usr/local/go
           curl -LO https://golang.org/dl/go1.20.5.linux-amd64.tar.gz
           sudo tar -C /usr/local -xzf go1.20.5.linux-amd64.tar.gz
           echo "export PATH=/usr/local/go/bin:$PATH" >> $GITHUB_ENV
+          echo "GOPATH=$HOME/go" >> $GITHUB_ENV
+          echo "GOBIN=$HOME/go/bin" >> $GITHUB_ENV
 
-      # 缓存 Wails CLI
-      - name: Cache Wails CLI
+      # 确保 Go 环境配置正确
+      - name: Verify Go installation
+        run: |
+          echo "Go version:"
+          go version
+          echo "Go environment:"
+          go env
+
+      # 缓存 Go 模块依赖
+      - name: Cache Go modules
         uses: actions/cache@v3
         with:
-          path: $HOME/go/bin/wails
-          key: wails-cli-${{ runner.os }}-latest
+          path: |
+            ~/.cache/go-build
+            ~/go/pkg/mod
+          key: go-${{ runner.os }}-mod-${{ hashFiles('**/go.sum') }}
           restore-keys: |
-            wails-cli-${{ runner.os }}-
+            go-${{ runner.os }}-mod-
 
-      # 安装 Wails CLI 如果缓存没有命中
+      # 安装 Wails CLI
       - name: Install Wails CLI
-        if: steps.cache-wails-cli.outputs.cache-hit != 'true'
         run: |
           mkdir -p $HOME/go/bin
           export GOBIN=$HOME/go/bin
           export PATH=$GOBIN:$PATH
           go install github.com/wailsapp/wails/v2/cmd/wails@latest
 
-      # 创建软链接，将 CryptoBox/go.mod 链接到根目录
-      - name: Create symlink for go.mod in root directory
+      # 确保 `go.mod` 和 `wails.json` 文件正确链接
+      - name: Create symlink for go.mod and wails.json
         run: |
-          ln -s $GITHUB_WORKSPACE/CryptoBox/go.mod $GITHUB_WORKSPACE/go.mod
+          ln -sf $GITHUB_WORKSPACE/CryptoBox/go.mod $GITHUB_WORKSPACE/go.mod
+          ln -sf $GITHUB_WORKSPACE/CryptoBox/wails.json $GITHUB_WORKSPACE/wails.json
 
-      # 创建软链接，将 CryptoBox/wails.json 链接到根目录
-      - name: Create symlink for wails.json in root directory
+      # 更新 Go 模块并安装 Wails 依赖
+      - name: Ensure Go modules and Wails dependencies are up-to-date
         run: |
-          ln -s $GITHUB_WORKSPACE/CryptoBox/wails.json $GITHUB_WORKSPACE/wails.json
-
-      # 更新 Wails 版本
-      - name: Update Wails version in go.mod
-        run: |
-          go get github.com/wailsapp/wails/v2@v2.9.2
           go mod tidy
+          go get github.com/wailsapp/wails/v2@v2.9.2
 
-      # Debug: List files to check for go.mod and wails.json in root directory
-      - name: List files in the root directory to check for go.mod and wails.json
+      # 确认 go.mod 文件已正确更新
+      - name: Verify go.mod and go.sum
         run: |
-          echo "Listing files in the root directory to ensure go.mod and wails.json exist:"
-          ls -la $GITHUB_WORKSPACE
-
-      # 检查 go.mod 是否存在
-      - name: Check for go.mod file
-        run: |
-          if [ ! -f "$GITHUB_WORKSPACE/go.mod" ]; then
-            echo "ERROR: go.mod not found"
-            exit 1
-          else
-            echo "go.mod found."
-          fi
-
-      # 检查 wails.json 是否存在
-      - name: Check for wails.json file
-        run: |
-          if [ ! -f "$GITHUB_WORKSPACE/wails.json" ]; then
-            echo "ERROR: wails.json not found"
-            exit 1
-          else
-            echo "wails.json found."
-          fi
+          cat go.mod
+          cat go.sum
 
       # 构建 Windows 平台可执行文件
       - name: Build Windows EXE
         run: |
           export PATH=$HOME/go/bin:$PATH
-          cd $GITHUB_WORKSPACE  # Ensure we're in the root directory of the repo
+          cd $GITHUB_WORKSPACE  # 确保处于项目根目录
           wails build -platform windows/amd64
 
       # 上传构建产物
