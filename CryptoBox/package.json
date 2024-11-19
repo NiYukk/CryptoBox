@@ -41,7 +41,8 @@
     "js-sha3": "^0.8.0",
     "keccak": "^3.0.3",
     "keccak256": "^1.0.6",
-    "react": "^18.0.0"
+    "react": "^18.0.0",
+    "father": "^1.0.0"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^5.15.1",
@@ -52,21 +53,10 @@
     "@umijs/plugin-analytics": "^0.2.3",
     "@umijs/test": "^3.0.5",
     "dumi": "^1.1.0",
-    "father": "^4.0.0-rc.2",
     "gh-pages": "^3.0.0",
     "lint-staged": "^10.0.7",
     "prettier": "^2.2.1",
     "sm-crypto": "^0.3.12",
     "yorkie": "^2.0.0"
-  }
-}
-{
-  "name": "frontend",
-  "version": "1.0.0",
-  "dependencies": {
-    "father": "^1.0.0"  // 确保这里有 father 依赖
-  },
-  "scripts": {
-    "build": "father build"  // 这里应该调用 father 的构建命令
   }
 }
