@@ -60,3 +60,13 @@
     "yorkie": "^2.0.0"
   }
 }
+{
+  "name": "frontend",
+  "version": "1.0.0",
+  "dependencies": {
+    "father": "^1.0.0"  // 确保这里有 father 依赖
+  },
+  "scripts": {
+    "build": "father build"  // 这里应该调用 father 的构建命令
+  }
+}
