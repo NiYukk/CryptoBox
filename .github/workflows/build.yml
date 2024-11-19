@@ -53,16 +53,31 @@ jobs:
           export PATH=$GOBIN:$PATH
           go install github.com/wailsapp/wails/v2/cmd/wails@latest
 
+      # 创建软链接，将 CryptoBox/go.mod 链接到根目录
+      - name: Create symlink for go.mod in root directory
+        run: |
+          ln -s $GITHUB_WORKSPACE/CryptoBox/go.mod $GITHUB_WORKSPACE/go.mod
+
       # 创建软链接，将 CryptoBox/wails.json 链接到根目录
       - name: Create symlink for wails.json in root directory
         run: |
           ln -s $GITHUB_WORKSPACE/CryptoBox/wails.json $GITHUB_WORKSPACE/wails.json
 
-      # Debug: List files to check for wails.json in root directory
-      - name: List files in the root directory to check for wails.json
+      # Debug: List files to check for go.mod and wails.json in root directory
+      - name: List files in the root directory to check for go.mod and wails.json
         run: |
-          echo "Listing files in the root directory to ensure wails.json exists:"
+          echo "Listing files in the root directory to ensure go.mod and wails.json exist:"
           ls -la $GITHUB_WORKSPACE
+
+      # 检查 go.mod 是否存在
+      - name: Check for go.mod file
+        run: |
+          if [ ! -f "$GITHUB_WORKSPACE/go.mod" ]; then
+            echo "ERROR: go.mod not found"
+            exit 1
+          else
+            echo "go.mod found."
+          fi
 
       # 检查 wails.json 是否存在
       - name: Check for wails.json file
