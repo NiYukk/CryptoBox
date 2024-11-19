@@ -12,6 +12,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       # 检出代码
       - name: Checkout repository
@@ -34,6 +35,12 @@ jobs:
           export GOBIN=$HOME/go/bin
           export PATH=$GOBIN:$PATH
           go install github.com/wailsapp/wails/v2/cmd/wails@latest
+
+      # 更新 go.mod 以使用最新的 Wails 版本
+      - name: Update go.mod to use Wails v2.9.2
+        run: |
+          sed -i 's/github.com\/wailsapp\/wails v2.3.1/github.com\/wailsapp\/wails\/v2 v2.9.2/' $GITHUB_WORKSPACE/go.mod
+          go mod tidy
 
       # 创建软链接，将 info.json 链接到项目根目录作为 package.json
       - name: Create symlink for info.json
