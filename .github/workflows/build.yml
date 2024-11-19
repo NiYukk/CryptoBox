@@ -39,7 +39,9 @@ jobs:
       # 更新 go.mod 以使用最新的 Wails 版本
       - name: Update go.mod to use Wails v2.9.2
         run: |
-          sed -i 's/github.com\/wailsapp\/wails v2.3.1/github.com\/wailsapp\/wails\/v2 v2.9.2/' $GITHUB_WORKSPACE/CryptoBox/go.mod
+          # 确保在正确的目录中
+          cd $GITHUB_WORKSPACE/CryptoBox
+          sed -i 's/github.com\/wailsapp\/wails v2.3.1/github.com\/wailsapp\/wails\/v2 v2.9.2/' go.mod
           go mod tidy
 
       # 创建软链接，将 info.json 链接到项目根目录作为 package.json
@@ -67,6 +69,7 @@ jobs:
       # 确保 Go 模块和依赖已更新
       - name: Ensure Go modules and dependencies are updated
         run: |
+          cd $GITHUB_WORKSPACE/CryptoBox
           go mod tidy
           go mod vendor
 
