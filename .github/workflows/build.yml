@@ -66,7 +66,7 @@ jobs:
       # 更新 Wails 版本
       - name: Update Wails version in go.mod
         run: |
-          go get github.com/wailsapp/wails@v2.9.2
+          go get github.com/wailsapp/wails/v2@v2.9.2
           go mod tidy
 
       # Debug: List files to check for go.mod and wails.json in root directory
