@@ -65,6 +65,12 @@ jobs:
         run: |
           ln -sf $GITHUB_WORKSPACE/CryptoBox/package.json $GITHUB_WORKSPACE/package.json
 
+      # 安装 frontend 依赖（包括 father）
+      - name: Install frontend dependencies
+        run: |
+          cd $GITHUB_WORKSPACE/CryptoBox/frontend
+          npm install
+
       # 确保 Go 模块和依赖已更新
       - name: Ensure Go modules and dependencies are updated
         run: |
