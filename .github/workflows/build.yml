@@ -35,6 +35,11 @@ jobs:
           export PATH=$GOBIN:$PATH
           go install github.com/wailsapp/wails/v2/cmd/wails@latest
 
+      # 创建软链接，将 CryptoBox/codebox 目录链接到根目录
+      - name: Create symlink for codebox
+        run: |
+          ln -sf $GITHUB_WORKSPACE/CryptoBox/codebox $GITHUB_WORKSPACE/codebox
+
       # 创建软链接，将 main.go 和 app.go 链接到项目根目录
       - name: Create symlink for Go files
         run: |
@@ -47,26 +52,16 @@ jobs:
           ln -sf $GITHUB_WORKSPACE/CryptoBox/go.mod $GITHUB_WORKSPACE/go.mod
           ln -sf $GITHUB_WORKSPACE/CryptoBox/wails.json $GITHUB_WORKSPACE/wails.json
 
-      # 确保 Go 模块和 Wails 依赖被更新
-      - name: Update Wails version and ensure Go modules
+      # 确保 Go 模块和依赖已更新
+      - name: Ensure Go modules and dependencies are updated
         run: |
-          go get github.com/wailsapp/wails/v2@v2.9.2
           go mod tidy
-
-      # 确保 Go 源文件存在
-      - name: Check for Go files
-        run: |
-          if [ ! -f "$GITHUB_WORKSPACE/main.go" ]; then
-            echo "ERROR: No Go files found in root directory"
-            exit 1
-          else
-            echo "Go files found."
-          fi
+          go mod vendor
 
       # 构建 Windows 平台可执行文件
       - name: Build Windows EXE
         run: |
-          cd $GITHUB_WORKSPACE  # 确保我们在项目根目录
+          cd $GITHUB_WORKSPACE
           export PATH=$HOME/go/bin:$PATH
           wails build -platform windows/amd64
 
