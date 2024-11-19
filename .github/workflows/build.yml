@@ -12,48 +12,45 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
       # 检出代码
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # 清理并重新安装 Go
+      # 缓存 Go 安装
+      - name: Cache Go installation
+        uses: actions/cache@v3
+        with:
+          path: /usr/local/go
+          key: go-${{ runner.os }}-1.20.5
+          restore-keys: |
+            go-${{ runner.os }}-
+
+      # 安装 Go 如果缓存没有命中
       - name: Ensure fresh Go installation
+        if: steps.cache-go.outputs.cache-hit != 'true'
         run: |
           sudo rm -rf /usr/local/go
           curl -LO https://golang.org/dl/go1.20.5.linux-amd64.tar.gz
           sudo tar -C /usr/local -xzf go1.20.5.linux-amd64.tar.gz
           echo "export PATH=/usr/local/go/bin:$PATH" >> $GITHUB_ENV
 
-      # 验证 Go 安装
-      - name: Verify Go installation
-        run: |
-          echo "Go version:"
-          go version
-          echo "Go environment:"
-          go env
+      # 缓存 Wails CLI
+      - name: Cache Wails CLI
+        uses: actions/cache@v3
+        with:
+          path: $HOME/go/bin/wails
+          key: wails-cli-${{ runner.os }}-latest
+          restore-keys: |
+            wails-cli-${{ runner.os }}-
 
-      # 启用 Go 模块模式
-      - name: Enable Go module mode
-        run: echo "GO111MODULE=on" >> $GITHUB_ENV
-
-      # 初始化 Go 模块
-      - name: Initialize Go module
-        run: |
-          cd $GITHUB_WORKSPACE
-          if [ ! -f go.mod ]; then
-            echo "No go.mod found, initializing Go module."
-            go mod init example.com/myproject
-          fi
-          go mod tidy
-
-      # 安装 Wails CLI
+      # 安装 Wails CLI 如果缓存没有命中
       - name: Install Wails CLI
+        if: steps.cache-wails-cli.outputs.cache-hit != 'true'
         run: |
           mkdir -p $HOME/go/bin
           export GOBIN=$HOME/go/bin
-          export PATH=$GOBIN:$PATH  # Ensure this PATH is applied in the current step
+          export PATH=$GOBIN:$PATH
           go install github.com/wailsapp/wails/v2/cmd/wails@latest
 
       # Debug: List files to check for wails.json
@@ -75,7 +72,6 @@ jobs:
       # 构建 Windows 平台可执行文件
       - name: Build Windows EXE
         run: |
-          # Ensure Wails CLI is in PATH
           export PATH=$HOME/go/bin:$PATH
           cd $GITHUB_WORKSPACE  # Ensure we're in the root directory of the repo
           wails build -platform windows/amd64
