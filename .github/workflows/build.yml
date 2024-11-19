@@ -53,16 +53,16 @@ jobs:
           export PATH=$GOBIN:$PATH
           go install github.com/wailsapp/wails/v2/cmd/wails@latest
 
-      # Debug: List files to check for info.json
-      - name: List files in the root directory
+      # Debug: List files to check for info.json in the correct directory
+      - name: List files in CryptoBox/build/windows to check for info.json
         run: |
-          echo "Listing files in the current directory to ensure info.json exists:"
-          ls -la $GITHUB_WORKSPACE
+          echo "Listing files in CryptoBox/build/windows to ensure info.json exists:"
+          ls -la $GITHUB_WORKSPACE/CryptoBox/build/windows
 
       # 检查 info.json 是否存在
       - name: Check for info.json file
         run: |
-          if [ ! -f "$GITHUB_WORKSPACE/info.json" ]; then
+          if [ ! -f "$GITHUB_WORKSPACE/CryptoBox/build/windows/info.json" ]; then
             echo "ERROR: info.json not found"
             exit 1
           else
