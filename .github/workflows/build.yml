@@ -53,21 +53,16 @@ jobs:
           export PATH=$GOBIN:$PATH
           go install github.com/wailsapp/wails/v2/cmd/wails@latest
 
-      # 重命名 info.json 为 wails.json
-      - name: Rename info.json to wails.json
+      # Debug: List files to check for wails.json in CryptoBox
+      - name: List files in CryptoBox to check for wails.json
         run: |
-          mv $GITHUB_WORKSPACE/CryptoBox/build/windows/info.json $GITHUB_WORKSPACE/CryptoBox/build/windows/wails.json
-
-      # Debug: List files to check for wails.json
-      - name: List files in CryptoBox/build/windows to check for wails.json
-        run: |
-          echo "Listing files in CryptoBox/build/windows to ensure wails.json exists:"
-          ls -la $GITHUB_WORKSPACE/CryptoBox/build/windows
+          echo "Listing files in CryptoBox to ensure wails.json exists:"
+          ls -la $GITHUB_WORKSPACE/CryptoBox
 
       # 检查 wails.json 是否存在
       - name: Check for wails.json file
         run: |
-          if [ ! -f "$GITHUB_WORKSPACE/CryptoBox/build/windows/wails.json" ]; then
+          if [ ! -f "$GITHUB_WORKSPACE/CryptoBox/wails.json" ]; then
             echo "ERROR: wails.json not found"
             exit 1
           else
